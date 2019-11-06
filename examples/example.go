@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"strings"
 
 	"github.com/arawal/cyberark"
 )
@@ -14,8 +13,7 @@ func main() {
 		Password: "passwordhere",
 		BaseURL:  "urlhere",
 	}
-	token, err := cyberark.Authenticate(creds)
-	creds.AuthToken = strings.Replace(token, "\"", "", -1)
+	creds.AuthToken, err = cyberark.Authenticate(creds)
 	fmt.Println(creds.AuthToken, err)
 	res, err := cyberark.GetAccounts(creds)
 	fmt.Println(res, err)

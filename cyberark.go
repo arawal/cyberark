@@ -2,6 +2,7 @@ package cyberark
 
 import (
 	"encoding/json"
+	"strings"
 )
 
 // Credentials provides an interface to store fields required for authentication
@@ -62,35 +63,41 @@ type CustomRequestParams struct {
 // Authenticate authenticates a sessions and returns the session token
 func Authenticate(creds Credentials) (string, error) {
 	res, err := login(creds)
-	return string(res), err
+	return strings.Replace(string(res), "\"", "", -1), err
 }
 
 func GetAccounts(creds Credentials) (ar AccountsResponse, err error) {
+	if creds.AuthToken == "" {
+		creds.AuthToken, err = Authenticate(creds)
+		if err != nil {
+			return
+		}
+	}
 	res, err := getAccounts(creds)
 	if err != nil {
-		return ar, err
+		return
 	}
 
 	err = json.Unmarshal(res, &ar)
-	return ar, err
+	return
 }
 
 func GetSafes(creds Credentials) (sr SafesResponse, err error) {
 	res, err := getSafes(creds)
 	if err != nil {
-		return sr, err
+		return
 	}
 
 	err = json.Unmarshal(res, &sr)
-	return sr, err
+	return
 }
 
 func MakeCustomAPIRequest(creds Credentials, params CustomRequestParams) (r map[string]interface{}, err error) {
 	res, err := makeCustomAPIRequest(creds, params)
 	if err != nil {
-		return r, err
+		return
 	}
 
 	err = json.Unmarshal(res, &r)
-	return r, err
+	return
 }

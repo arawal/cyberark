@@ -19,4 +19,13 @@ func main() {
 	fmt.Println(creds.AuthToken, err)
 	res, err := cyberark.GetAccounts(creds)
 	fmt.Println(res, err)
+	res2, err := cyberark.GetSafes(creds)
+	fmt.Println(res2, err)
+	res3, err := cyberark.MakeCustomAPIRequest(creds, cyberark.CustomRequestParams{
+		Method:   "GET",
+		Endpoint: "/api/accounts?limit=1",
+		Headers:  map[string]string{},
+		Payload:  nil,
+	})
+	fmt.Println(res3, err)
 }

@@ -1,6 +1,7 @@
 package cyberark
 
 import (
+	"bytes"
 	"crypto/tls"
 	"encoding/json"
 	"fmt"
@@ -62,6 +63,57 @@ func getAccounts(credentials Credentials) ([]byte, error) {
 	req, err := http.NewRequest(method, url, nil)
 	if err != nil {
 		return nil, err
+	}
+
+	res, err := sendRequest(req, credentials)
+	if err != nil {
+		return nil, err
+	}
+
+	var errRes serverError
+	if mErr := json.Unmarshal(res, &errRes); mErr == nil && (errRes.ErrorCode != "" || errRes.ErrorMessage != "") {
+		return nil, fmt.Errorf("Server returned error code: %s. Error message: %s", errRes.ErrorCode, strings.Replace(errRes.ErrorMessage, "\n", " ", -1))
+	}
+	return res, nil
+}
+
+func getSafes(credentials Credentials) ([]byte, error) {
+	url := fmt.Sprintf("%s/WebServices/PIMServices.svc/Safes", credentials.BaseURL)
+	method := "GET"
+
+	req, err := http.NewRequest(method, url, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	res, err := sendRequest(req, credentials)
+	if err != nil {
+		return nil, err
+	}
+
+	var errRes serverError
+	if mErr := json.Unmarshal(res, &errRes); mErr == nil && (errRes.ErrorCode != "" || errRes.ErrorMessage != "") {
+		return nil, fmt.Errorf("Server returned error code: %s. Error message: %s", errRes.ErrorCode, strings.Replace(errRes.ErrorMessage, "\n", " ", -1))
+	}
+	return res, nil
+}
+
+func makeCustomAPIRequest(credentials Credentials, params CustomRequestParams) ([]byte, error) {
+	url := fmt.Sprintf("%s/%s", credentials.BaseURL, params.Endpoint)
+	method := params.Method
+
+	reqBody, err := json.Marshal(params.Payload)
+	if err != nil {
+		return nil, fmt.Errorf("Malformed request payload: %s", err.Error())
+	}
+
+	req, err := http.NewRequest(method, url, bytes.NewBuffer(reqBody))
+	if err != nil {
+		return nil, err
+	}
+
+	for k, v := range params.Headers {
+		req.Header.Add(k, v)
 	}
 
 	res, err := sendRequest(req, credentials)

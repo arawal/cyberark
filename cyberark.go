@@ -39,6 +39,26 @@ type AccountsResponse struct {
 	Count int64            `json:"count"`
 }
 
+type SafeSummary struct {
+	Description               string      `json:"Description"`
+	ManagingCPM               string      `json:"ManagingCPM"`
+	NumberOfDaysRetention     int         `json:"NumberOfDaysRetention"`
+	NumberOfVersionsRetention interface{} `json:"NumberOfVersionsRetention"`
+	OLACEnabled               bool        `json:"OLACEnabled"`
+	SafeName                  string      `json:"SafeName"`
+}
+
+type SafesResponse struct {
+	GetSafesResult []SafeSummary `json:"GetSafesResult"`
+}
+
+type CustomRequestParams struct {
+	Method   string
+	Endpoint string
+	Payload  map[string]interface{}
+	Headers  map[string]string
+}
+
 // Authenticate authenticates a sessions and returns the session token
 func Authenticate(creds Credentials) (string, error) {
 	res, err := login(creds)
@@ -53,4 +73,24 @@ func GetAccounts(creds Credentials) (ar AccountsResponse, err error) {
 
 	err = json.Unmarshal(res, &ar)
 	return ar, err
+}
+
+func GetSafes(creds Credentials) (sr SafesResponse, err error) {
+	res, err := getSafes(creds)
+	if err != nil {
+		return sr, err
+	}
+
+	err = json.Unmarshal(res, &sr)
+	return sr, err
+}
+
+func MakeCustomAPIRequest(creds Credentials, params CustomRequestParams) (r map[string]interface{}, err error) {
+	res, err := makeCustomAPIRequest(creds, params)
+	if err != nil {
+		return r, err
+	}
+
+	err = json.Unmarshal(res, &r)
+	return r, err
 }

@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"net/url"
 	"strings"
 	"time"
 )
@@ -57,10 +58,11 @@ func login(credentials Credentials) ([]byte, error) {
 }
 
 func getAccounts(credentials Credentials, params AccountsRequestParams) ([]byte, error) {
-	url := fmt.Sprintf("%s/api/Accounts?search=%s&sort=%s&offset=%s&limit=%s", credentials.BaseURL, params.SearchBy, params.SortOn, params.Offset, params.Limit)
+	endpoint := fmt.Sprintf("%s/api/Accounts?search=%s&sort=%s&offset=%s&limit=%s", credentials.BaseURL, params.SearchBy, params.SortOn, params.Offset, params.Limit)
+	endpoint = url.QueryEscape(endpoint)
 	method := "GET"
 
-	req, err := http.NewRequest(method, url, nil)
+	req, err := http.NewRequest(method, endpoint, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -78,10 +80,11 @@ func getAccounts(credentials Credentials, params AccountsRequestParams) ([]byte,
 }
 
 func getSafes(credentials Credentials) ([]byte, error) {
-	url := fmt.Sprintf("%s/WebServices/PIMServices.svc/Safes", credentials.BaseURL)
+	endpoint := fmt.Sprintf("%s/WebServices/PIMServices.svc/Safes", credentials.BaseURL)
+	endpoint = url.QueryEscape(endpoint)
 	method := "GET"
 
-	req, err := http.NewRequest(method, url, nil)
+	req, err := http.NewRequest(method, endpoint, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -99,7 +102,8 @@ func getSafes(credentials Credentials) ([]byte, error) {
 }
 
 func makeCustomAPIRequest(credentials Credentials, params CustomRequestParams) ([]byte, error) {
-	url := fmt.Sprintf("%s/%s", credentials.BaseURL, params.Endpoint)
+	endpoint := fmt.Sprintf("%s/%s", credentials.BaseURL, params.Endpoint)
+	endpoint = url.QueryEscape(endpoint)
 	method := params.Method
 
 	reqBody, err := json.Marshal(params.Payload)
@@ -107,7 +111,7 @@ func makeCustomAPIRequest(credentials Credentials, params CustomRequestParams) (
 		return nil, fmt.Errorf("Malformed request payload: %s", err.Error())
 	}
 
-	req, err := http.NewRequest(method, url, bytes.NewBuffer(reqBody))
+	req, err := http.NewRequest(method, endpoint, bytes.NewBuffer(reqBody))
 	if err != nil {
 		return nil, err
 	}

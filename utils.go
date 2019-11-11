@@ -103,7 +103,7 @@ func getSafes(credentials Credentials) ([]byte, error) {
 func makeCustomAPIRequest(credentials Credentials, params CustomRequestParams) ([]byte, error) {
 	qp := strings.Split(params.Endpoint, "?")
 	if len(qp) > 1 {
-		params.Endpoint = qp[0] + url.QueryEscape(qp[1])
+		params.Endpoint = qp[0] + "?" + url.QueryEscape(qp[1])
 	}
 	endpoint := fmt.Sprintf("%s/%s", credentials.BaseURL, params.Endpoint)
 	endpoint = url.QueryEscape(endpoint)

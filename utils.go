@@ -106,7 +106,6 @@ func makeCustomAPIRequest(credentials Credentials, params CustomRequestParams) (
 		params.Endpoint = qp[0] + "?" + url.QueryEscape(qp[1])
 	}
 	endpoint := fmt.Sprintf("%s/%s", credentials.BaseURL, params.Endpoint)
-	endpoint = url.QueryEscape(endpoint)
 	method := params.Method
 
 	reqBody, err := json.Marshal(params.Payload)

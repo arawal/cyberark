@@ -56,8 +56,8 @@ func login(credentials Credentials) ([]byte, error) {
 	return res, nil
 }
 
-func getAccounts(credentials Credentials) ([]byte, error) {
-	url := fmt.Sprintf("%s/api/Accounts", credentials.BaseURL)
+func getAccounts(credentials Credentials, params AccountsRequestParams) ([]byte, error) {
+	url := fmt.Sprintf("%s/api/Accounts?search=%s&sort=%s %s&offset=%s&limit=%s", credentials.BaseURL, params.SearchBy, params.SortOn, params.SortDirection, params.Offset, params.Limit)
 	method := "GET"
 
 	req, err := http.NewRequest(method, url, nil)

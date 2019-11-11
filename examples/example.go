@@ -15,7 +15,13 @@ func main() {
 	}
 	creds.AuthToken, err = cyberark.Authenticate(creds)
 	fmt.Println(creds.AuthToken, err)
-	res, err := cyberark.GetAccounts(creds)
+	res, err := cyberark.GetAccounts(creds, cyberark.AccountsRequestParams{
+		SearchBy:      "",
+		SortOn:        "",
+		SortDirection: "",
+		Offset:        "",
+		Limit:         "",
+	})
 	fmt.Println(res, err)
 	res2, err := cyberark.GetSafes(creds)
 	fmt.Println(res2, err)

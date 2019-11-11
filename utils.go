@@ -58,7 +58,8 @@ func login(credentials Credentials) ([]byte, error) {
 }
 
 func getAccounts(credentials Credentials, params AccountsRequestParams) ([]byte, error) {
-	endpoint := fmt.Sprintf("%s/api/Accounts?search=%s&sort=%s&offset=%s&limit=%s", credentials.BaseURL, params.SearchBy, params.SortOn, params.Offset, params.Limit)
+	qp := url.QueryEscape(fmt.Sprintf("search=%s&sort=%s&offset=%s&limit=%s", params.SearchBy, params.SortOn, params.Offset, params.Limit))
+	endpoint := fmt.Sprintf("%s/api/Accounts?%s", credentials.BaseURL, qp)
 	endpoint = url.QueryEscape(endpoint)
 	method := "GET"
 
@@ -81,7 +82,6 @@ func getAccounts(credentials Credentials, params AccountsRequestParams) ([]byte,
 
 func getSafes(credentials Credentials) ([]byte, error) {
 	endpoint := fmt.Sprintf("%s/WebServices/PIMServices.svc/Safes", credentials.BaseURL)
-	endpoint = url.QueryEscape(endpoint)
 	method := "GET"
 
 	req, err := http.NewRequest(method, endpoint, nil)
@@ -102,6 +102,10 @@ func getSafes(credentials Credentials) ([]byte, error) {
 }
 
 func makeCustomAPIRequest(credentials Credentials, params CustomRequestParams) ([]byte, error) {
+	qp := strings.Split(params.Endpoint, "?")
+	if len(qp) > 1 {
+		params.Endpoint = qp[0] + url.QueryEscape(qp[1])
+	}
 	endpoint := fmt.Sprintf("%s/%s", credentials.BaseURL, params.Endpoint)
 	endpoint = url.QueryEscape(endpoint)
 	method := params.Method

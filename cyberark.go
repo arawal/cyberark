@@ -2,6 +2,7 @@ package cyberark
 
 import (
 	"encoding/json"
+	"fmt"
 	"strings"
 )
 
@@ -88,6 +89,12 @@ func GetAccounts(creds Credentials, params AccountsRequestParams) (ar AccountsRe
 		creds.AuthToken, err = Authenticate(creds)
 		if err != nil {
 			return
+		}
+	}
+
+	if params.SortOn != "" {
+		if params.SortDirection != "" {
+			params.SortOn = fmt.Sprintf("%s %s", params.SortOn, params.SortDirection)
 		}
 	}
 	res, err := getAccounts(creds, params)

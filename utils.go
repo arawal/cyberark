@@ -60,7 +60,6 @@ func login(credentials Credentials) ([]byte, error) {
 func getAccounts(credentials Credentials, params AccountsRequestParams) ([]byte, error) {
 	qp := url.QueryEscape(fmt.Sprintf("search=%s&sort=%s&offset=%s&limit=%s", params.SearchBy, params.SortOn, params.Offset, params.Limit))
 	endpoint := fmt.Sprintf("%s/api/Accounts?%s", credentials.BaseURL, qp)
-	endpoint = url.QueryEscape(endpoint)
 	method := "GET"
 
 	req, err := http.NewRequest(method, endpoint, nil)
